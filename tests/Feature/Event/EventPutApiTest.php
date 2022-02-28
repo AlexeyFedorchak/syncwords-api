@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Event;
 
+use App\Models\Event;
 use Illuminate\Support\Str;
 use Tests\Feature\SyncWordsTestCase;
 
@@ -75,8 +76,8 @@ class EventPutApiTest extends SyncWordsTestCase
         $data = [
             'id' => $event->id,
             'event_title' => Str::random(10),
-            'event_start_date' => now(),
-            'event_end_date' => now()->addHours(5),
+            'event_start_date' => now()->format('Y-m-d H:m:s'),
+            'event_end_date' => now()->addHours(5)->format('Y-m-d H:m:s'),
         ];
 
         $this->actingAs($user)
@@ -85,5 +86,9 @@ class EventPutApiTest extends SyncWordsTestCase
             ->assertJsonStructure([
                 'message'
             ]);
+
+        $this->assertEquals(Event::where('id', $event->id)
+            ->first(['id', 'event_title', 'event_start_date', 'event_end_date'])
+            ->toArray(), $data);
     }
 }

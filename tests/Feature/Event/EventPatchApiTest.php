@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Event;
 
+use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Tests\Feature\SyncWordsTestCase;
@@ -82,12 +83,11 @@ class EventPatchApiTest extends SyncWordsTestCase
     {
         $user = $this->userWithEvents();
         $event = $user->events()->first();
+        $newEventTitle = Str::random(10);
 
         $data = [
             'id' => $event->id,
-            'event_title' => Str::random(10),
-            'event_start_date' => now(),
-            'event_end_date' => now()->addHours(11),
+            'event_title' => $newEventTitle,
         ];
 
         $this->actingAs($user)
@@ -96,5 +96,7 @@ class EventPatchApiTest extends SyncWordsTestCase
             ->assertJsonStructure([
                 'message'
             ]);
+
+        $this->assertEquals(Event::find($event->id)->event_title, $newEventTitle);
     }
 }

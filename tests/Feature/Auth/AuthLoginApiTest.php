@@ -78,8 +78,18 @@ class AuthLoginApiTest extends TestCase
                 'token_type'
             ]);
 
-//        $this->getJson(route('api.auth.logout'), ['Authorization' => $response['access_token']])
-//            ->assertStatus(200)
-//            ->assertJsonStructure(['message']);
+        $this->getJson(route('api.event.list'), ['Authorization' => $response['access_token']])
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'message',
+                'data' => [
+                    '*' => [
+                        'id',
+                        'event_title',
+                        'event_start_date',
+                        'event_end_date',
+                    ]
+                ]
+            ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Event;
 
+use App\Models\Event;
 use Tests\Feature\SyncWordsTestCase;
 
 class EventDeleteApiTest extends SyncWordsTestCase
@@ -51,5 +52,7 @@ class EventDeleteApiTest extends SyncWordsTestCase
             ->assertJsonStructure([
                 'message',
             ]);
+
+        $this->assertNull(Event::find($event->id));
     }
 }

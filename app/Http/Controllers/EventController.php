@@ -58,7 +58,8 @@ class EventController extends Controller
             ], 422);
         }
 
-        $event->update([$request->id], $request->except('id'));
+        $event->update($request->except('id'));
+        $event->save();
 
         return response()->json([
             'message' => 'Success',
@@ -80,7 +81,9 @@ class EventController extends Controller
             ], 404);
         }
 
-        $event->update([$request->id], $request->except('id'));
+
+        $event->update($request->except('id'));
+        $event->save();
 
         return response()->json([
             'message' => 'Success',
