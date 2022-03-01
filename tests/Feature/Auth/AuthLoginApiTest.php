@@ -4,9 +4,10 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Tests\Feature\SyncWordsTestCase;
 use Tests\TestCase;
 
-class AuthLoginApiTest extends TestCase
+class AuthLoginApiTest extends SyncWordsTestCase
 {
     /**
      * Validation enabled, so correct data needs to be passed
@@ -16,7 +17,7 @@ class AuthLoginApiTest extends TestCase
      */
     public function assert_validation_enabled()
     {
-        $this->postJson(route('api.login'))
+        $this->postJson(route('api.auth.login'))
             ->assertStatus(422);
 
         $password = 'password';
@@ -26,10 +27,10 @@ class AuthLoginApiTest extends TestCase
                 'password' => Hash::make($password),
             ]);
 
-        $this->postJson(route('api.login'), ['email' => $user->email])
+        $this->postJson(route('api.auth.login'), ['email' => $user->email])
             ->assertStatus(422);
 
-        $this->postJson(route('api.login'), ['password' => $password])
+        $this->postJson(route('api.auth.login'), ['password' => $password])
             ->assertStatus(422);
     }
 
@@ -46,7 +47,7 @@ class AuthLoginApiTest extends TestCase
                 'password' => Hash::make('password'),
             ]);
 
-        $this->postJson(route('api.login'), [
+        $this->postJson(route('api.auth.login'), [
             'email' => $user->email,
             'password' => 'not_valid_password'
         ])
@@ -67,7 +68,7 @@ class AuthLoginApiTest extends TestCase
                 'password' => Hash::make('password'),
             ]);
 
-        $response = $this->postJson(route('api.login'), [
+        $this->postJson(route('api.auth.login'), [
             'email' => $user->email,
             'password' => 'password'
         ])
@@ -76,20 +77,6 @@ class AuthLoginApiTest extends TestCase
             ->assertJsonStructure([
                 'access_token',
                 'token_type'
-            ]);
-
-        $this->getJson(route('api.event.list'), ['Authorization' => $response['access_token']])
-            ->assertStatus(200)
-            ->assertJsonStructure([
-                'message',
-                'data' => [
-                    '*' => [
-                        'id',
-                        'event_title',
-                        'event_start_date',
-                        'event_end_date',
-                    ]
-                ]
             ]);
     }
 }

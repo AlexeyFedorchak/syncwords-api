@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EventController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Events\EventController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,12 +15,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('login', [AuthController::class, 'login'])->name('api.login');
+Route::post('login', [AuthController::class, 'login'])->name('api.auth.login');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/list', [EventController::class, 'getEvents'])->name('api.event.list');
-    Route::get('/{id}', [EventController::class, 'getEvent'])->name('api.event.get');
-    Route::put('/{id}', [EventController::class, 'put'])->name('api.event.put');
-    Route::patch('/{id}', [EventController::class, 'patch'])->name('api.event.patch');
-    Route::delete('/{id}', [EventController::class, 'delete'])->name('api.event.delete');
+    Route::post('refresh', [AuthController::class, 'refresh'])->name('api.auth.refresh');
+    Route::post('logout', [AuthController::class, 'logout'])->name('api.auth.logout');
+
+    Route::get('/events/list', [EventController::class, 'getEvents'])->name('api.event.list');
+    Route::get('/events/{id}', [EventController::class, 'getEvent'])->name('api.event.get');
+    Route::put('/event/{id}', [EventController::class, 'put'])->name('api.event.put');
+    Route::patch('/event/{id}', [EventController::class, 'patch'])->name('api.event.patch');
+    Route::delete('/event/{id}', [EventController::class, 'delete'])->name('api.event.delete');
 });

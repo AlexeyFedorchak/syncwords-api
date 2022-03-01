@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
@@ -52,4 +53,14 @@ class SyncWordsTestCase extends TestCase
             ]);
     }
 
+    /**
+     * get bearer token for given user
+     *
+     * @param User $user
+     * @return string
+     */
+    protected function getBearerToken(User $user): string
+    {
+        return 'Bearer ' . $user->createToken('auth_token')->plainTextToken;
+    }
 }
