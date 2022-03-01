@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,5 +63,18 @@ class SyncWordsTestCase extends TestCase
     protected function getBearerToken(User $user): string
     {
         return 'Bearer ' . $user->createToken('auth_token')->plainTextToken;
+    }
+
+    /**
+     * get event instance
+     *
+     * @param User $user
+     * @return Event
+     */
+    protected function event(User $user): Event
+    {
+        return Event::factory()->create([
+            'organization_id' => $user->id,
+        ]);
     }
 }

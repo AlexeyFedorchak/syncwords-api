@@ -18,7 +18,7 @@ class EventFactory extends Factory
             'event_title' => $this->faker->title,
             'event_start_date' => now(),
             'event_end_date' => now()->addHours(11),
-            'organization_id' => User::factory()->make()->id,
+            'organization_id' => User::factory()->create()->id,
         ];
     }
 }

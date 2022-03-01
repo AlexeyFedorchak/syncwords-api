@@ -4,7 +4,7 @@ namespace Tests\Feature\Event;
 
 use Tests\Feature\SyncWordsTestCase;
 
-class EventListApiTest extends SyncWordsTestCase
+class EventIndexApiTest extends SyncWordsTestCase
 {
     /**
      * Only authorized user can get all events
@@ -12,9 +12,9 @@ class EventListApiTest extends SyncWordsTestCase
      * @test
      * @return void
      */
-    public function assert_only_user_can_get_all_events()
+    public function assert_guest_cannot_see_events()
     {
-        $this->getJson(route('api.event.list'))
+        $this->getJson(route('api.events.index'))
             ->assertStatus(401);
     }
 
@@ -24,13 +24,12 @@ class EventListApiTest extends SyncWordsTestCase
      * @test
      * @return void
      */
-    public function assert_correct_json_structure_returned()
+    public function assert_correct_json_structure_returned_on_event_index()
     {
         $this->actingAs($this->userWithEvents())
-            ->getJson(route('api.event.list'))
+            ->getJson(route('api.events.index'))
             ->assertStatus(200)
             ->assertJsonStructure([
-                'message',
                 'data' => [
                     '*' => [
                         'id',

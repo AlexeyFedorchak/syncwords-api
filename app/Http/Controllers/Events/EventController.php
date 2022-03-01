@@ -3,112 +3,62 @@
 namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PatchEventRequest;
-use App\Http\Requests\PutEventRequest;
+use App\Http\Requests\UpdateEventRequest;
+use App\Http\Resources\EventResource;
+use App\Models\Event;
 use Illuminate\Http\JsonResponse;
-use function auth;
-use function response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class EventController extends Controller
 {
     /**
-     * Get all events for organization
+     * get events based on particular authorized organization
      *
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function getEvents(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
-        return response()->json([
-            'message' => 'Success',
-            'data' => auth()->user()->events()->get()
-        ]);
+        return EventResource::collection(
+            Event::where('organization_id', auth()->id())
+                ->get(),
+        );
     }
 
     /**
      * Get event for organization
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param Event $event
+     * @return EventResource
      */
-    public function getEvent(int $id): JsonResponse
+    public function show(Event $event): EventResource
     {
-        $event = auth()->user()->events()->where('id', $id)->first();
-
-        if (!$event) {
-            return response()->json([
-                'message' => 'Invalid id',
-            ], 422);
-        }
-
-        return response()->json([
-            'message' => 'Success',
-            'data' => auth()->user()->events()
-        ]);
+        return new EventResource($event);
     }
 
     /**
+     * Get event for organization
      *
-     * @param PutEventRequest $request
-     * @return JsonResponse
+     * @param Event $event
+     * @param UpdateEventRequest $request
+     * @return EventResource
      */
-    public function put(PutEventRequest $request): JsonResponse
+    public function update(Event $event, UpdateEventRequest $request): EventResource
     {
-        $event = auth()->user()->events()->where('id', $request->id)->first();
+        $event->update(
+            $request->validated()
+        );
 
-        if (!$event) {
-            return response()->json([
-                'message' => 'Invalid id',
-            ], 422);
-        }
-
-        $event->update($request->except('id'));
-        $event->save();
-
-        return response()->json([
-            'message' => 'Success',
-        ]);
-    }
-
-    /**
-     *
-     * @param PatchEventRequest $request
-     * @return JsonResponse
-     */
-    public function patch(PatchEventRequest $request): JsonResponse
-    {
-        $event = auth()->user()->events()->where('id', $request->id)->first();
-
-        if (!$event) {
-            return response()->json([
-                'message' => 'Data not found',
-            ], 404);
-        }
-
-
-        $event->update($request->except('id'));
-        $event->save();
-
-        return response()->json([
-            'message' => 'Success',
-        ]);
+        return new EventResource($event->refresh());
     }
 
     /**
      * Delete event
      *
-     * @param int $id
+     * @param Event $event
      * @return JsonResponse
      */
-    public function delete(int $id): JsonResponse
+    public function destroy(Event $event): JsonResponse
     {
-        $event = auth()->user()->events()->where('id', $id)->first();
-
-        if (!$event) {
-            return response()->json([
-                'message' => 'Invalid id',
-            ], 422);
-        }
-
         $event->delete();
 
         return response()->json([

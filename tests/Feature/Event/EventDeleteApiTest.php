@@ -15,24 +15,11 @@ class EventDeleteApiTest extends SyncWordsTestCase
      */
     public function assert_only_user_can_delete_event()
     {
-        $this->deleteJson(route('api.event.delete', ['id' => 1]))
-            ->assertStatus(401);
-    }
-
-    /**
-     * Validation enabled, so correct data needs to be passed
-     *
-     * @test
-     * @return void
-     */
-    public function assert_validation_enabled()
-    {
-        $this->actingAs($this->user())
-            ->deleteJson(route('api.event.delete', ['id' => 1]))
-            ->assertStatus(422)
-            ->assertJsonStructure([
-                'message',
-            ]);
+        $this->deleteJson(
+            route('api.events.destroy', [
+                'event' => Event::factory()->create()
+            ])
+        )->assertStatus(401);
     }
 
     /**
@@ -43,11 +30,14 @@ class EventDeleteApiTest extends SyncWordsTestCase
      */
     public function assert_correct_json_structure_returned()
     {
-        $user = $this->userWithEvents();
-        $event = $user->events()->first();
+        $event = $this->event($user = $this->user());
 
         $this->actingAs($user)
-            ->deleteJson(route('api.event.delete', ['id' => $event->id]))
+            ->deleteJson(
+                route('api.events.destroy', [
+                    'event' => $event
+                ])
+            )
             ->assertStatus(200)
             ->assertJsonStructure([
                 'message',
