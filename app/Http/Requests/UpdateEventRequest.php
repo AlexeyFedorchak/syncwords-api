@@ -51,13 +51,14 @@ class UpdateEventRequest extends FormRequest
             ],
             'event_start_date' => [
                 'required',
-                'date'
+                'date',
+                new EventStartDateRule($this, $this->event)
             ],
             'event_end_date' => [
                 'required',
                 'date',
                 'after:event_start_date',
-                new EventEndDateRule($this),
+                new EventEndDateRule($this, $this->event),
             ]
         ];
     }
@@ -76,12 +77,12 @@ class UpdateEventRequest extends FormRequest
             ],
             'event_start_date' => [
                 'date',
-                new EventStartDateRule($this)
+                new EventStartDateRule($this, $this->event)
             ],
             'event_end_date' => [
                 'date',
                 'after:event_start_date',
-                new EventEndDateRule($this),
+                new EventEndDateRule($this, $this->event),
             ]
         ];
     }

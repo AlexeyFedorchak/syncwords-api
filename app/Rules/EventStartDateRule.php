@@ -2,6 +2,8 @@
 
 namespace App\Rules;
 
+use App\Constants\DateTimeConstants;
+use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -16,13 +18,21 @@ class EventStartDateRule implements Rule
     protected $eventRequest;
 
     /**
+     * get event to check if dates values are compatible with given value
+     *
+     * @var Event
+     */
+    protected $event;
+
+    /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct(FormRequest $request)
+    public function __construct(FormRequest $request, Event $event)
     {
         $this->eventRequest = $request;
+        $this->event = $event;
     }
 
     /**
@@ -34,27 +44,15 @@ class EventStartDateRule implements Rule
      */
     public function passes($attribute, $value): bool
     {
-        $startDate = Carbon::parse($value);
-        $endDate = Carbon::parse($this->eventRequest->event_end_date);
+        $endDate = Carbon::parse($value);
 
-        if (!$this->eventRequest->event_end_date) {
-            $event = $this->eventRequest
-                ->user()
-                ->events()
-                ->find($this->eventRequest->id);
-
-            if ($event) {
-                $endDate = Carbon::parse($event->event_end_date);
-            } else {
-                return false;
-            }
+        if ($this->eventRequest->event_end_date) {
+            $startDate = Carbon::parse($this->eventRequest->event_end_date);
+        } else {
+            $startDate = Carbon::parse($this->event->event_end_date);
         }
 
-        if ($endDate > $startDate && $startDate->addHours(12) >= $endDate) {
-            return true;
-        }
-
-        return false;
+        return $endDate->diffInHours($startDate) < DateTimeConstants::MAX_DIFF_BETWEEN_START_END_DATE;
     }
 
     /**
