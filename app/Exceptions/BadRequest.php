@@ -8,14 +8,14 @@ use Illuminate\Http\JsonResponse;
 class BadRequest extends Exception
 {
     /**
-     * render response
+     * render response | due security reasons error has very general message
      *
      * @return JsonResponse
      */
     public function render(): JsonResponse
     {
         return response()->json([
-            'message' => 'Incorrect method used for such kind of request',
-        ], 405);
+            'message' => 'Bad request',
+        ], 400);
     }
 }
